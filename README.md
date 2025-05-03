@@ -25,6 +25,7 @@ This script takes your C++ solution file and an input template file, then:
 
 *   Python 3 🐍
 *   A C++ compiler (specifically `g++`) installed and accessible in your PATH. ⚙️
+*   ⚠️ **Linux/Unix Environment Recommended**: This script uses shell commands (`cat`, `|`, `>>`) that are standard in Linux and macOS environments. While it might be adaptable for Windows (e.g., using WSL, Git Bash, or MinGW environments), it's **designed and tested primarily for Linux** and may not work out-of-the-box on Windows.
 
 ## 🚀 Usage
 
