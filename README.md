@@ -57,10 +57,25 @@ The `input.txt` file serves as the blueprint for your generated `.in` files. The
 
 Use these tags to insert random data:
 
-*   `%i[min-max]`: Generates a random **integer** (inclusive range).
-    *   *e.g., `%i[1-10]`*
-*   `%f[min-max]`: Generates a random **float**.
-    *   *e.g., `%f[2.5-4]`*
+*   `%i[min-max]`: Generates a random **integer** between `min` and `max` (inclusive).
+    *   *Examples:*
+        *   `%i[1-100]` (integer between 1 and 100)
+        *   `%i[0-0]` (always generates the integer 0)
+*   `%f[min-max]`: Generates a random **float** between `min` and `max`.
+    *   *Examples:*
+        *   `%f[0.0-1.0]` (float between 0.0 and 1.0)
+*   `%s[charset:length]`: Generates a random **string**.
+    *   `charset`: Specifies the pool of characters to choose from.
+        *   Use keywords `upper` (A-Z), `lower` (a-z), `numbers` (0-9), separated by `/`. (e.g., `upper/lower`, `lower/numbers`)
+        *   Alternatively, provide a specific string of allowed characters in double quotes (e.g., `"abc123"`, `"01"`).
+    *   `length`: Specifies the length of the generated string.
+        *   A single integer `N` for a fixed length (e.g., `:6`).
+        *   A range `min-max` for a variable length (e.g., `:10-50`).
+    *   *Examples:*
+        *   `%s[lower:10-20]` (lowercase string, length 10 to 20)
+        *   `%s[upper/numbers:5]` (uppercase letters and digits, fixed length 5)
+        *   `%s["aeiou":3]` (string of length 3 using only 'a', 'e', 'i', 'o', 'u')
+        *   `%s["01":1]` (a single random binary digit '0' or '1')
 
 All other text is copied exactly as it appears.
 
@@ -74,7 +89,6 @@ All other text is copied exactly as it appears.
 
 ## 🔮 Future Plans
 
-*   **String Placeholders:** Generate random strings with options for length limits and allowed/disallowed characters.
 *   **Multi-Language Support:** Add support for Python, Java, C#, and potentially other languages.
 *   **Float Formatting Control:** Specify precision for generated floats (e.g., `%f[0-1, prec=5]`).
 *   **Time Limit Enforcement:** Kill the solution if it runs too long and report a Time Limit Exceeded (TLE) status.
