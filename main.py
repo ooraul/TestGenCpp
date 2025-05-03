@@ -3,6 +3,7 @@ import random
 import shutil
 import os
 import os.path
+import string
 
 SOLUTION_FILENAME = "solution.cpp"
 INPUT_FILENAME = "input.txt" # You can change these
@@ -40,19 +41,50 @@ def main(num_test_cases):
     for i in range(1, num_test_cases + 1, 1):
         log(f"Generating `{i}.in`...")
 
-        entrada_final = modelo
+        final_input = modelo
 
         for arg in modelo_args:
             if arg[1] == "i":
                 range_min, range_max = [int(x) for x in arg[3:-1].split("-")]
-                entrada_final = entrada_final.replace(arg, f"{random.randint(range_min, range_max)}", 1)
+                final_input = final_input.replace(arg, f"{random.randint(range_min, range_max)}", 1)
 
             if arg[1] == "f":
                 range_min, range_max = [float(x) for x in arg[3:-1].split("-")]
-                entrada_final = entrada_final.replace(arg, f"{random.uniform(range_min, range_max)}", 1)
+                final_input = final_input.replace(arg, f"{random.uniform(range_min, range_max)}", 1)
+
+            if arg[1] == "s":
+                options = arg[3:-1].split(":")
+
+                chars_whitelist = ""
+
+                string_length = 0
+
+                options_length_range = options[1].split("-")
+                
+                if len(options_length_range) == 1:
+                    string_length = int(options_length_range[0])
+                else:
+                    range_min, range_max = [int(x) for x in options_length_range]
+                    string_length = random.randint(range_min, range_max)
+
+                if options[0][0] == '"':
+                    chars_whitelist = options[0][1:-1]
+                else:
+                    options_choices = options[0].lower().split("/")
+
+                    if "lower" in options_choices:
+                        chars_whitelist += string.ascii_lowercase
+                    
+                    if "upper" in options_choices:
+                        chars_whitelist += string.ascii_uppercase
+
+                    if "numbers" in options_choices:
+                        chars_whitelist += string.digits
+
+                final_input = final_input.replace(arg, "".join(random.choices(chars_whitelist, k=string_length)), 1)
 
         with open(f"./cases/{i}.in", "w") as file:
-            file.write(entrada_final + "\n")
+            file.write(final_input + "\n")
 
         log(f"Generating `{i}.out`...")
 
@@ -60,6 +92,7 @@ def main(num_test_cases):
             subprocess.run(f"(cat ./cases/{i}.in | ./.solution) >> ./cases/{i}.out", shell=True, executable="/bin/bash")
 
     os.remove("./.solution")
+    log(f"Removed compiled solution.")
 
     log(f"{num_test_cases} test cases generated successfully! ({os.getcwd()}/cases)")
 

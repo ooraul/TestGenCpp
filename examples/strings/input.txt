@@ -1,0 +1,5 @@
+%s[upper/lower/numbers:10-50]
+%s[upper/lower:5-8]
+%s[lower:20-25]
+%s["abc123":6]
+%s["01":1] %s["01":1] %s["01":1]
