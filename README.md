@@ -72,6 +72,14 @@ All other text is copied exactly as it appears.
 
 *   You can change the default filenames (`SOLUTION_FILENAME`, `INPUT_FILENAME`) at the top of the `main.py` script if needed.
 
+## 🔮 Future Plans
+
+*   **String Placeholders:** Generate random strings with options for length limits and allowed/disallowed characters.
+*   **Multi-Language Support:** Add support for Python, Java, C#, and potentially other languages.
+*   **Float Formatting Control:** Specify precision for generated floats (e.g., `%f[0-1, prec=5]`).
+*   **Time Limit Enforcement:** Kill the solution if it runs too long and report a Time Limit Exceeded (TLE) status.
+*   **Specific Structure Generation:** Helpers for common structures like generating valid graphs (e.g., number of nodes/edges, ensuring connectivity or acyclicity if needed) or trees.
+
 ## 🙏 Contributing
 
 Want to help improve this script? Contributions are welcome!
