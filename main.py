@@ -10,9 +10,9 @@ SOLUTION_FILENAME = "solution.cpp"
 INPUT_FILENAME = "input.txt" # You can change these
 
 def log(content, error=False):
-    print(f"{"\033[91mERROR -" if error else f"-"} {content}")
+    print(f"{f"\033[91mERROR -" if error else "-"} {content}\033[0m")
 
-def main(num_test_cases):
+def main(num_test_cases, time_limit):
     time_start = time.time()
 
     if not os.path.isfile(f"./{SOLUTION_FILENAME}"):
@@ -52,7 +52,7 @@ def main(num_test_cases):
 
                 if range_max < range_min:
                     log(f"Cannot generate a random integer because {range_min} > {range_max}", True)
-                    return
+                    return os.remove("./_temp_solution")
                 
                 final_input = final_input.replace(arg, f"{random.randint(range_min, range_max)}", 1)
 
@@ -68,7 +68,7 @@ def main(num_test_cases):
 
                 if range_max < range_min:
                     log(f"Cannot generate a random float because {range_min} > {range_max}", True)
-                    return
+                    return os.remove("./_temp_solution")
                 
                 final_input = final_input.replace(arg, f"{round(random.uniform(range_min, range_max), float_precision)}", 1)
 
@@ -109,7 +109,11 @@ def main(num_test_cases):
         log(f"Generating `{i}.out`...")
 
         with open(f"./cases/{i}.out", "w") as file:
-            subprocess.run(f"(cat ./cases/{i}.in | ./_temp_solution) >> ./cases/{i}.out", shell=True, executable="/bin/bash")
+            try:
+                subprocess.run(f"(cat ./cases/{i}.in | ./_temp_solution) >> ./cases/{i}.out", shell=True, executable="/bin/bash", timeout=time_limit)
+            except subprocess.TimeoutExpired:
+                log(f"TLE on {i}.in (exceeded {time_limit} seconds limit)", True)
+                return os.remove("./_temp_solution")
 
     os.remove("./_temp_solution")
     log(f"Removed compiled solution.")
@@ -120,8 +124,16 @@ def main(num_test_cases):
 
 if __name__ == "__main__":
     num_test_cases = int(input("Enter the number of test cases to generate: "))
+    time_limit = input("Enter the time limit in seconds (leave empty for default: 0.5 second): ")
+
+    if len(time_limit) == 0:
+        time_limit = 0.5
+    else:
+        time_limit = float(time_limit)
 
     if num_test_cases <= 0:
         log("Invalid number of test cases.", True)
+    elif time_limit <= 0:
+        log("Invalid time limit.", True)
     else:
-        main(num_test_cases)
+        main(num_test_cases, time_limit)
