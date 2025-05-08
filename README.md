@@ -55,27 +55,43 @@ The `input.txt` file serves as the blueprint for your generated `.in` files. The
 
 **Placeholders:**
 
-Use these tags to insert random data:
+*   `%i[min:max]`: Generates a random **integer** between `min` and `max` (inclusive).
+    *   The `min` and `max` values are separated by a colon `:`.
+    *   *Examples:*
+        *   `%i[1:100]` (generates an integer between 1 and 100, e.g., `42`)
+        *   `%i[0:0]` (always generates the integer `0`)
+        *   `%i[-10:10]` (generates an integer between -10 and 10)
 
-*   `%i[min-max]`: Generates a random **integer** between `min` and `max` (inclusive).
+*   `%f[min:max]` or `%f[min:max:precision]`: Generates a random **float** between `min` and `max`.
+    *   The `min` and `max` values are separated by a colon `:`.
+    *   An optional `precision` (number of decimal places) can be specified after another colon. If omitted, `precision` defaults to 5.
     *   *Examples:*
-        *   `%i[1-100]` (integer between 1 and 100)
-        *   `%i[0-0]` (always generates the integer 0)
-*   `%f[min-max]`: Generates a random **float** between `min` and `max`.
+        *   `%f[0.0:1.0]` (generates a float between 0.0 and 1.0, e.g., `0.73215`)
+        *   `%f[1.5:10.5:2]` (generates a float between 1.5 and 10.5, rounded to 2 decimal places, e.g., `6.88`)
+        *   `%f[-5.0:5.0:0]` (generates a float between -5.0 and 5.0, rounded to 0 decimal places, effectively an integer, e.g., `-2.0`)
+
+*   `%s[charset_specifier:length_specifier]`: Generates a random **string**.
+    *   The `charset_specifier` and `length_specifier` are separated by a colon `:`.
+    *   **`charset_specifier`**: Defines the pool of characters to choose from.
+        *   **Keywords**: Use predefined keywords `lower` (a-z), `upper` (A-Z), `numbers` (0-9). Multiple keywords can be combined, separated by a forward slash `/`. The keywords are case-insensitive.
+            *   `lower` (generates from `abcdefghijklmnopqrstuvwxyz`)
+            *   `upper/numbers` (generates from `ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`)
+            *   `lower/upper/numbers` (generates from all alphanumeric characters)
+        *   **Literal String**: Provide a specific string of allowed characters enclosed in double quotes.
+            *   `"abcde"` (generates using only 'a', 'b', 'c', 'd', 'e')
+            *   `"01"` (generates a binary string)
+            *   `"!@#$"` (generates using only these special characters)
+    *   **`length_specifier`**: Specifies the length of the generated string.
+        *   **Fixed Length**: A single integer `N` for a string of exactly `N` characters.
+            *   `:5` (generates a string of length 5)
+        *   **Variable Length**: A range `min-max` (integers separated by a hyphen `-`) for a string whose length is a random integer between `min` and `max` (inclusive).
+            *   `:10-20` (generates a string with length between 10 and 20)
     *   *Examples:*
-        *   `%f[0.0-1.0]` (float between 0.0 and 1.0)
-*   `%s[charset:length]`: Generates a random **string**.
-    *   `charset`: Specifies the pool of characters to choose from.
-        *   Use keywords `upper` (A-Z), `lower` (a-z), `numbers` (0-9), separated by `/`. (e.g., `upper/lower`, `lower/numbers`)
-        *   Alternatively, provide a specific string of allowed characters in double quotes (e.g., `"abc123"`, `"01"`).
-    *   `length`: Specifies the length of the generated string.
-        *   A single integer `N` for a fixed length (e.g., `:6`).
-        *   A range `min-max` for a variable length (e.g., `:10-50`).
-    *   *Examples:*
-        *   `%s[lower:10-20]` (lowercase string, length 10 to 20)
-        *   `%s[upper/numbers:5]` (uppercase letters and digits, fixed length 5)
-        *   `%s["aeiou":3]` (string of length 3 using only 'a', 'e', 'i', 'o', 'u')
-        *   `%s["01":1]` (a single random binary digit '0' or '1')
+        *   `%s[lower:10-20]` (lowercase string, length 10 to 20, e.g., `qwertzuiopasdf`)
+        *   `%s[upper/numbers:5]` (uppercase letters and digits, fixed length 5, e.g., `A3B1Z`)
+        *   `%s["aeiou":3]` (string of length 3 using only 'a', 'e', 'i', 'o', 'u', e.g., `eia`)
+        *   `%s["01":1]` (a single random binary digit '0' or '1', e.g., `0`)
+        *   `%s[lower/upper:1]` (a single random uppercase or lowercase letter)
 
 All other text is copied exactly as it appears.
 
@@ -90,7 +106,6 @@ All other text is copied exactly as it appears.
 ## 🔮 Future Plans
 
 *   **Multi-Language Support:** Add support for Python, Java, C#, and potentially other languages.
-*   **Float Formatting Control:** Specify precision for generated floats (e.g., `%f[0-1, prec=5]`).
 *   **Time Limit Enforcement:** Kill the solution if it runs too long and report a Time Limit Exceeded (TLE) status.
 *   **Specific Structure Generation:** Helpers for common structures like generating valid graphs (e.g., number of nodes/edges, ensuring connectivity or acyclicity if needed) or trees.
 
