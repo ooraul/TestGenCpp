@@ -106,7 +106,6 @@ All other text is copied exactly as it appears.
 ## 🔮 Future Plans
 
 *   **Multi-Language Support:** Add support for Python, Java, C#, and potentially other languages.
-*   **Time Limit Enforcement:** Kill the solution if it runs too long and report a Time Limit Exceeded (TLE) status.
 *   **Specific Structure Generation:** Helpers for common structures like generating valid graphs (e.g., number of nodes/edges, ensuring connectivity or acyclicity if needed) or trees.
 
 ## 🙏 Contributing
