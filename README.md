@@ -15,7 +15,6 @@ This script:
 
 *   Python 3 🐍
 *   `g++` (C++ compiler) installed and in your system's PATH. ⚙️
-*   ⚠️ **Linux/Unix Environment Recommended**: This script uses shell commands (`cat`, `|`, `>>`) that are standard in Linux and macOS environments. While it might be adaptable for Windows (e.g., using WSL, Git Bash, or MinGW environments), it's **designed and tested primarily for Linux** and may not work out-of-the-box on Windows.
 
 ## 🚀 Quick Start
 
@@ -81,13 +80,8 @@ Any text in `input.txt` not matching a placeholder format is copied directly.
 
 ➡️ **For a concrete example demonstrating how to structure your template with both placeholders and static text, please refer to the examples included in the root of this repository.**
 
-## 🔧 Customization
-
-*   You can change the default filenames (`SOLUTION_FILENAME`, `INPUT_FILENAME`) at the top of the `main.py` script if needed.
-
 ## 🔮 Future Ideas
 
-*   Support for other programming languages.
 *   Helpers for generating specific structures (e.g., graphs, trees).
 
 ## 🙏 Contributing

@@ -10,7 +10,7 @@ SOLUTION_FILENAME = "solution.cpp"
 INPUT_FILENAME = "input.txt" # You can change these
 
 def log(content, error=False):
-    print(f"{f"\033[91mERROR -" if error else "-"} {content}\033[0m")
+    print(f"{f"ERROR -" if error else "-"} {content}")
 
 def main(num_test_cases, time_limit):
     time_start = time.time()
@@ -18,17 +18,23 @@ def main(num_test_cases, time_limit):
     if not os.path.isfile(f"./{SOLUTION_FILENAME}"):
         log(f"Could not find the solution `{SOLUTION_FILENAME}`!", True)
         return
-    
+
     log(f"Solution `{SOLUTION_FILENAME}` found!")
 
     if not os.path.isfile(f"./{INPUT_FILENAME}"):
         log(f"Could not find the input template `{INPUT_FILENAME}`!", True)
         return
-    
+
     log(f"Input template `{INPUT_FILENAME}` found!")
 
     log("Compiling solution...")
-    subprocess.run(f"g++ {SOLUTION_FILENAME} -o _temp_solution", shell=True, executable="/bin/bash")
+
+    try:
+        subprocess.run(["g++", SOLUTION_FILENAME, "-o", ".temp_solution.out"], check=True)
+    except subprocess.CalledProcessError as e:
+        log(f"Error during compilation: {e}", True)
+        return
+
     log("Solution compiled successfully!")
 
     if os.path.exists("./cases"):
@@ -52,13 +58,13 @@ def main(num_test_cases, time_limit):
 
                 if range_max < range_min:
                     log(f"Cannot generate a random integer because {range_min} > {range_max}", True)
-                    return os.remove("./_temp_solution")
-                
+                    return os.remove("./.temp_solution.out")
+
                 final_input = final_input.replace(arg, f"{random.randint(range_min, range_max)}", 1)
 
             if arg[1] == "f":
                 options = arg[3:-1].split(":")
-                
+
                 range_min, range_max = map(float, options[:2])
 
                 float_precision = 5
@@ -68,8 +74,8 @@ def main(num_test_cases, time_limit):
 
                 if range_max < range_min:
                     log(f"Cannot generate a random float because {range_min} > {range_max}", True)
-                    return os.remove("./_temp_solution")
-                
+                    return os.remove("./.temp_solution.out")
+
                 final_input = final_input.replace(arg, f"{round(random.uniform(range_min, range_max), float_precision)}", 1)
 
             if arg[1] == "s":
@@ -80,7 +86,7 @@ def main(num_test_cases, time_limit):
                 string_length = 0
 
                 options_length_range = options[1].split("-")
-                
+
                 if len(options_length_range) == 1:
                     string_length = int(options_length_range[0])
                 else:
@@ -94,7 +100,7 @@ def main(num_test_cases, time_limit):
 
                     if "lower" in options_choices:
                         chars_whitelist += string.ascii_lowercase
-                    
+
                     if "upper" in options_choices:
                         chars_whitelist += string.ascii_uppercase
 
@@ -103,20 +109,29 @@ def main(num_test_cases, time_limit):
 
                 final_input = final_input.replace(arg, "".join(random.choices(chars_whitelist, k=string_length)), 1)
 
-        with open(f"./cases/{i}.in", "w") as file:
+        case_in_path = os.path.join("cases", f"{i}.in")
+        with open(case_in_path, "w") as file:
             file.write(final_input + "\n")
 
         log(f"Generating `{i}.out`...")
 
-        with open(f"./cases/{i}.out", "w") as file:
-            try:
-                subprocess.run(f"(cat ./cases/{i}.in | ./_temp_solution) >> ./cases/{i}.out", shell=True, executable="/bin/bash", timeout=time_limit)
-            except subprocess.TimeoutExpired:
-                log(f"TLE on {i}.in (exceeded {time_limit} seconds limit)", True)
-                return os.remove("./_temp_solution")
+        case_out_path = os.path.join("cases", f"{i}.out")
+        try:
+            with open(case_in_path, "r") as input_file:
+                with open(case_out_path, "w") as output_file:
+                    subprocess.run(
+                        ["./.temp_solution.out"],
+                        stdin=input_file,
+                        stdout=output_file,
+                        timeout=time_limit,
+                        check=True
+                    )
+        except subprocess.TimeoutExpired:
+            log(f"TLE on {i}.in (exceeded {time_limit} seconds limit)", True)
+            os.remove("./.temp_solution.out")
 
-    os.remove("./_temp_solution")
-    log(f"Removed compiled solution.")
+    os.remove("./.temp_solution.out")
+    log("Removed compiled solution.")
 
     time_end = time.time()
 
