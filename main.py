@@ -5,6 +5,7 @@ import os
 import os.path
 import string
 import time
+import re
 
 SOLUTION_FILENAME = "solution.cpp"
 INPUT_FILENAME = "input.txt" # You can change these
@@ -45,44 +46,46 @@ def main(num_test_cases, time_limit):
     log("Directory `cases` created!")
 
     modelo = open(f"./{INPUT_FILENAME}").read()
-    modelo_args = modelo.split()
+
+    placeholder_pattern = re.compile(r"%([ifs])\[([^\]]+)\]")
 
     for i in range(1, num_test_cases + 1, 1):
         log(f"Generating `{i}.in`...")
 
         final_input = modelo
 
-        for arg in modelo_args:
-            if arg[1] == "i":
-                range_min, range_max = [int(x) for x in arg[3:-1].split(":")]
+        def replace_placeholder(match):
+            placeholder_type = match.group(1)
+            options_str = match.group(2)
+
+            if placeholder_type == "i":
+                range_min, range_max = [int(x) for x in options_str.split(":")]
 
                 if range_max < range_min:
                     log(f"Cannot generate a random integer because {range_min} > {range_max}", True)
-                    return os.remove("./.temp_solution.out")
+                    raise
 
-                final_input = final_input.replace(arg, f"{random.randint(range_min, range_max)}", 1)
+                return str(random.randint(range_min, range_max))
 
-            if arg[1] == "f":
-                options = arg[3:-1].split(":")
-
+            if placeholder_type == "f":
+                options = options_str.split(":")
                 range_min, range_max = map(float, options[:2])
 
                 float_precision = 5
 
                 if len(options) == 3:
                     float_precision = int(options[2])
-
+                    
                 if range_max < range_min:
                     log(f"Cannot generate a random float because {range_min} > {range_max}", True)
-                    return os.remove("./.temp_solution.out")
+                    raise
 
-                final_input = final_input.replace(arg, f"{round(random.uniform(range_min, range_max), float_precision)}", 1)
+                return f"{round(random.uniform(range_min, range_max), float_precision)}"
 
-            if arg[1] == "s":
-                options = arg[3:-1].split(":")
+            if placeholder_type == "s":
+                options = options_str.split(":")
 
                 chars_whitelist = ""
-
                 string_length = 0
 
                 options_length_range = options[1].split("-")
@@ -93,21 +96,26 @@ def main(num_test_cases, time_limit):
                     range_min, range_max = [int(x) for x in options_length_range]
                     string_length = random.randint(range_min, range_max)
 
-                if options[0][0] == '"':
+                if options[0][0] == '"' and options[0][-1] == '"':
                     chars_whitelist = options[0][1:-1]
                 else:
                     options_choices = options[0].lower().split("/")
-
                     if "lower" in options_choices:
                         chars_whitelist += string.ascii_lowercase
-
                     if "upper" in options_choices:
                         chars_whitelist += string.ascii_uppercase
-
                     if "numbers" in options_choices:
                         chars_whitelist += string.digits
 
-                final_input = final_input.replace(arg, "".join(random.choices(chars_whitelist, k=string_length)), 1)
+                return "".join(random.choices(chars_whitelist, k=string_length))
+            return match.group(0)
+        
+        try:
+            final_input = placeholder_pattern.sub(replace_placeholder, modelo)
+        except Exception as e:
+            log(f"Error during input generation for {i}.in: {e}", True)
+            os.remove("./.temp_solution.out")
+            return
 
         case_in_path = os.path.join("cases", f"{i}.in")
         with open(case_in_path, "w") as file:
@@ -128,9 +136,12 @@ def main(num_test_cases, time_limit):
                     )
         except subprocess.TimeoutExpired:
             log(f"TLE on {i}.in (exceeded {time_limit} seconds limit)", True)
-            os.remove("./.temp_solution.out")
 
-    os.remove("./.temp_solution.out")
+            return os.remove("./.temp_solution.out")
+
+    if os.path.exists("./.temp_solution.out"):
+        os.remove("./.temp_solution.out")
+
     log("Removed compiled solution.")
 
     time_end = time.time()
